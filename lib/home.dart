@@ -1,12 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:yoga_guru/login.dart';
 import 'package:yoga_guru/poses.dart';
-import 'package:yoga_guru/profile.dart';
 import 'package:yoga_guru/scale_route.dart';
-import 'package:yoga_guru/size_route.dart';
 import 'package:yoga_guru/util/pose_data.dart';
-import 'package:yoga_guru/util/auth.dart';
 import 'package:yoga_guru/util/user.dart';
 
 class Home extends StatelessWidget {
@@ -31,41 +27,8 @@ class Home extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text('Yoga Guru'),
+        title: Text('Fitness Counter'),
         centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Profile(
-                  email: user.email,
-                  uid: user.uid,
-                  displayName: user.displayName,
-                  photoUrl: user.photoUrl,
-                ),
-              ),
-            ),
-            child: CircleProfileImage(
-              user: user,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () async {
-              Auth auth = Auth();
-              await auth.signOut();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Login(
-                    cameras: cameras,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -76,7 +39,7 @@ class Home extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(32.0),
                 child: Text(
-                  'Welcome\n${user.displayName}',
+                  'Choose Excercise Group',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
@@ -85,7 +48,7 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              // Beginner Button
+              // Lower Body Button
               Padding(
                 padding: const EdgeInsets.all(32.0),
                 child: ButtonTheme(
@@ -97,7 +60,7 @@ class Home extends StatelessWidget {
                   child: FlatButton(
                     color: Colors.green,
                     child: Text(
-                      'Beginner',
+                      'Body Weight',
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -105,69 +68,42 @@ class Home extends StatelessWidget {
                     ),
                     onPressed: () => _onPoseSelect(
                       context,
-                      'Beginner',
-                      beginnerAsanas,
+                      'Body Weight',
+                      bodyWeight,
                       Colors.green,
                     ),
                   ),
                 ),
               ),
 
-              // Intermediate Button
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: ButtonTheme(
-                  minWidth: 200,
-                  height: 60,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: FlatButton(
-                    color: Colors.blue,
-                    child: Text(
-                      'Intermediate',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onPressed: () => _onPoseSelect(
-                      context,
-                      'Intermediate',
-                      intermediateAsanas,
-                      Colors.blue,
-                    ),
-                  ),
-                ),
-              ),
+//              // Upper Body Button
+//              Padding(
+//                padding: const EdgeInsets.all(32.0),
+//                child: ButtonTheme(
+//                  minWidth: 200,
+//                  height: 60,
+//                  shape: RoundedRectangleBorder(
+//                    borderRadius: BorderRadius.circular(30),
+//                  ),
+//                  child: FlatButton(
+//                    color: Colors.blue,
+//                    child: Text(
+//                      'Placeholder',
+//                      style: TextStyle(
+//                        fontSize: 20,
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                    onPressed: () => _onPoseSelect(
+//                      context,
+//                      'Upper Body',
+//                      upperBody,
+//                      Colors.blue,
+//                    ),
+//                  ),
+//                ),
+//              ),
 
-              // Advance Button
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: ButtonTheme(
-                  minWidth: 200,
-                  height: 60,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: FlatButton(
-                    color: Colors.deepPurple,
-                    child: Text(
-                      'Advance',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onPressed: () => _onPoseSelect(
-                      context,
-                      'Advance',
-                      advanceAsanas,
-                      Colors.deepPurple[400],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

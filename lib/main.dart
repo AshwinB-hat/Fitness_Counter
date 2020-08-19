@@ -2,8 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yoga_guru/home.dart';
-import 'package:yoga_guru/login.dart';
-import 'package:yoga_guru/register.dart';
 import 'package:yoga_guru/util/user.dart';
 
 List<CameraDescription> cameras;
@@ -65,11 +63,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Yoga Guru',
+      title: 'Fitness Counter',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      initialRoute: (email != null && uid != null) ? '/' : '/login',
+      initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => Home(
               email: email,
@@ -77,12 +75,8 @@ class MyApp extends StatelessWidget {
               displayName: displayName,
               photoUrl: photoUrl,
               cameras: cameras,
-            ),
-        '/login': (BuildContext context) => Login(
-              cameras: cameras,
-            ),
-        'register': (BuildContext context) => Register(),
-      },
+            )
+      }
     );
   }
 }

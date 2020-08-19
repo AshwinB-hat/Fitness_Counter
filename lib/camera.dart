@@ -20,8 +20,6 @@ class _CameraState extends State<Camera> {
   CameraController controller;
   bool isDetecting = false;
 
-  static const platform = const MethodChannel('ondeviceML');
-
   @override
   void initState() {
     super.initState();
@@ -60,7 +58,7 @@ class _CameraState extends State<Camera> {
               nmsRadius: 10,
             ).then((recognitions) {
               int endTime = new DateTime.now().millisecondsSinceEpoch;
-              print("Detection took ${endTime - startTime}");
+//              print("Detection took ${endTime - startTime}");
 
               widget.setRecognitions(recognitions, img.height, img.width);
 

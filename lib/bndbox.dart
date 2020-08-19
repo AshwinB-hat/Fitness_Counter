@@ -3,13 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 List<dynamic> _inputArr = [];
-String _label = 'Wrong Pose';
-double _percent = 0;
-double _counter = 0;
+int _counter = 0;
+bool flag = false;
 
 class BndBox extends StatelessWidget {
-  static const platform = const MethodChannel('ondeviceML');
-
   final List<dynamic> results;
   final int previewH;
   final int previewW;
@@ -17,7 +14,7 @@ class BndBox extends StatelessWidget {
   final double screenW;
   final String customModel;
 
-  const BndBox({
+  BndBox({
     this.results,
     this.previewH,
     this.previewW,
@@ -51,9 +48,10 @@ class BndBox extends StatelessWidget {
           }
           // print('x: ' + x.toString());
           // print('y: ' + y.toString());
-
-          _inputArr.add(x);
-          _inputArr.add(y);
+          if (k["part"] == 'rightShoulder' || k["part"] == 'leftShoulder') {
+            _inputArr.add(x);
+            _inputArr.add(y);
+          }
 
           // To solve mirror problem on front camera
           if (x > 320) {
@@ -81,11 +79,10 @@ class BndBox extends StatelessWidget {
           );
         }).toList();
 
-        // print("Input Arr: " + _inputArr.toList().toString());
+//         print("Input Arr: " + _inputArr.toList().toString());
         _getPrediction(_inputArr.cast<double>().toList());
 
         _inputArr.clear();
-        // print("Input Arr after clear: " + _inputArr.toList().toString());
 
         lists..addAll(list);
       });
@@ -97,28 +94,32 @@ class BndBox extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(32.0, 0, 32.0, 16.0),
-            child: Text(
-              _label.toString(),
-              style: TextStyle(
-                fontSize: 50,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+          Align(
+            alignment: Alignment.bottomCenter,
+//            child: LinearPercentIndicator(
+//              animation: true,
+//              lineHeight: 20.0,
+//              animationDuration: 500,
+//              animateFromLastPercent: true,
+//              percent: _counter,
+//              center: Text("${(_counter).toStringAsFixed(1)}"),
+//              linearStrokeCap: LinearStrokeCap.roundAll,
+//              progressColor: Colors.green,
+//            ),
+            child: Container(
+              height: 100,
+              width: 100,
+              child: FittedBox(
+                child: FloatingActionButton(
+                  backgroundColor: Colors.red,
+                  onPressed: resetCounter,
+                  child: Text(
+                    '${_counter.toString()}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
               ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(25.0, 0, 25.0, 25.0),
-            child: LinearPercentIndicator(
-              animation: true,
-              lineHeight: 20.0,
-              animationDuration: 500,
-              animateFromLastPercent: true,
-              percent: _counter,
-              center: Text("${(_counter * 100).toStringAsFixed(1)} %"),
-              linearStrokeCap: LinearStrokeCap.roundAll,
-              progressColor: Colors.green,
             ),
           ),
         ],
@@ -130,27 +131,25 @@ class BndBox extends StatelessWidget {
   }
 
   Future<void> _getPrediction(List<double> poses) async {
-    try {
-      final double result = await platform.invokeMethod('predictData', {
-        "model": customModel,
-        "arg": poses,
-      }); // passing arguments
+    if (poses != null) {
+      if (poses.elementAt(1) > 500 && poses.elementAt(3) > 500) {
+        flag = true;
+      }
 
-      _percent = result;
-      _label =
-          result < 0.5 ? "Wrong Pose" : (result * 100).toStringAsFixed(0) + "%";
-      updateCounter(_percent);
+      if (flag) {
+        double range = 300;
+        bool left_height_diff = poses.elementAt(1) < range;
+        bool right_height_diff = poses.elementAt(3) < range;
 
-      print("Final Label: " + result.toString());
-    } on PlatformException catch (e) {
-      return e.message;
+        if (left_height_diff && right_height_diff) {
+          _counter++;
+          flag = false;
+        }
+      }
     }
   }
 
-  void updateCounter(perc) {
-    if (perc > 0.5) {
-      (_counter += perc / 100) >= 1 ? _counter = 1.0 : _counter += perc / 100;
-    }
-    print("Counter: " + _counter.toString());
+  void resetCounter() {
+    _counter = 0;
   }
 }

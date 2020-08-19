@@ -1,6 +1,5 @@
 package com.example.yogaguru;
 
-import org.tensorflow.lite.Interpreter;
 import android.os.Bundle;
 
 import java.io.InputStream;
@@ -22,61 +21,11 @@ import android.util.Log;
 
 public class MainActivity extends FlutterActivity {
 	private static final String CHANNEL = "ondeviceML";
-	protected Interpreter tflite;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GeneratedPluginRegistrant.registerWith(this);
-
-		new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(new MethodCallHandler() {
-			@Override
-			public void onMethodCall(MethodCall call, Result result) {
-				if (call.method.equals("predictData")) {
-
-					try {
-						tflite = new Interpreter(loadModelFile(call.argument("model") + ".tflite"));
-					} catch (Exception e) {
-						System.out.println("Exception while loading: " + e);
-						throw new RuntimeException(e);
-					}
-					ArrayList<Double> args = call.argument("arg");
-					float prediction = predictData(args);
-					if (prediction != 0) {
-						result.success(prediction);
-					} else {
-						result.error("UNAVAILABLE", "prediction  not available.", null);
-					}
-				} else {
-					result.notImplemented();
-				}
-			}
-		});
-	}
-
-	// This method interact with our model and makes prediction returning value of
-	float predictData(ArrayList<Double> input_data) {
-		float inputArray[][] = new float[1][input_data.size()];
-		int i = 0;
-		for (Double e : input_data) {
-			inputArray[0][i] = e.floatValue();
-			i++;
-		}
-		float[][] output_data = new float[1][1];
-		tflite.run(inputArray, output_data);
-
-		Log.d("tag", ">> " + output_data[0][0]);
-
-		return output_data[0][0];
-	}
-
-	// method to load tflite file from device
-	private MappedByteBuffer loadModelFile(String modelName) throws Exception {
-		AssetFileDescriptor fileDescriptor = this.getAssets().openFd(modelName);
-		FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-		FileChannel fileChannel = inputStream.getChannel();
-		long startOffset = fileDescriptor.getStartOffset();
-		long declaredLength = fileDescriptor.getDeclaredLength();
-		return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-	}
+			// This method interact with our model and makes prediction returning value of
+}
 }
