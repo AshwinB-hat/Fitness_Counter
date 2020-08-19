@@ -1,11 +1,11 @@
 # Fitness Counter
 
-<img src="https://github.com/adityaas26/Yoga-Guru/blob/master/screenshots/fitnessCounter.JPG" alt="Home" height="350"/>
+<img src="https://github.com/AshwinB-hat/Fitness_Counter/blob/master/screenshots/fitnessCounter.JPG" alt="Home" height="350"/>
 
 **Fitness Counter** is your personalized fitness repetition counter app based on Flutter. It uses posenet, a pre-trained deep learning model, to estimate body poses in real time and Count the choses Excercise Repetitions.
 
-##DEMO SQUAT Counter
-[Squat Counter](https://github.com/adityaas26/Yoga-Guru/blob/master/screenshots/demo.gif)
+## DEMO SQUAT Counter
+![Squat Counter](https://github.com/AshwinB-hat/Fitness_Counter/blob/master/screenshots/demo.gif)
 
 ## Getting Started
 
@@ -45,19 +45,13 @@ Don't worry, we'll take a brief look at all the files in a minute! Let's start w
 
 This *_onPoseSelect()* method is quite important as the arguments given to this function decides which list of poses needs to be shown on the poses page.
 
-<br /><br /><br />
-
 ### 3. poses.dart
 **poses.dart** defines a *Poses* class, which is a stateless widget. It shows a list of available poses as [swipable cards](https://pub.dev/packages/flutter_swiper). The code of the custom cards can be found in **yoga_card.dart** file. Each card is clickable and calls the *_onSelect()* method which directs the user to the InferencePage (**inference.dart**).
-
-<br /><br /><br /><br /><br />
 
 ### 4. inference.dart
 **inference.dart** defines a *InferencePage* class, which is a stateful widget. It is the class which loads the posenet model. It initializes the Camera object with the camera instance and *_setRecognitions()* callback function. The *_setRecognitions()* method is responsibe for saving the predicted output of the PoseNet model into a List (*_recognitions*). This list of predicted values (*_recognitions*) is then passed to **BndBox's** constructor.
 
 You can read more about the implementation [here](https://github.com/shaqian/flutter_tflite#posenet).
-
-<br /><br />
 
 ### 5. camera.dart
 **camera.dart** defines a *Camera* class, which is a stateful widget. It contains code related to camera initialization and calls *Tflite.runPoseNetOnFrame()* method by passing in the current *CameraImage* as an argument. The output (predictions) of this method is given as an argument to the *_setRecognitions()* method, which was passed to Camera() as callback.
