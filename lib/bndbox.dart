@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -30,7 +31,7 @@ class _BndBoxState extends State<BndBox> {
   int _counter = 0;
   double lowerRange = 500,
   upperRange = 300;
-  bool flag = false, isCorrectPosture=false;
+  bool midCount = false, isCorrectPosture=false;
 
   void resetCounter() {
     setState(() {
@@ -44,9 +45,9 @@ class _BndBoxState extends State<BndBox> {
     });
   }
 
-  void setFlag(bool f) {
+  void setMidCount(bool f) {
     setState(() {
-      flag = f;
+      midCount = f;
     });
   }
 
@@ -101,15 +102,15 @@ class _BndBoxState extends State<BndBox> {
     if (poses != null) {
       //check posture before beginning count
       if (isCorrectPosture && poses['leftShoulder'][1] > upperRange && poses['rightShoulder'][1] > upperRange) {
-        setFlag(true);
+        setMidCount(true);
       }
 
-      if (flag && poses['leftShoulder'][1] < upperRange && poses['rightShoulder'][1] < upperRange) {
+      if (midCount && poses['leftShoulder'][1] < upperRange && poses['rightShoulder'][1] < upperRange) {
           incrementCounter();
-          setFlag(false);
+          setMidCount(false);
         }
-
-      if(!flag) {
+      //check the posture when not in midcount
+      if(!midCount) {
         _checkCorrectPosture(poses);
       }
     }
@@ -184,7 +185,7 @@ class _BndBoxState extends State<BndBox> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Align(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.center,
 //            child: LinearPercentIndicator(
 //              animation: true,
 //              lineHeight: 20.0,
@@ -195,6 +196,8 @@ class _BndBoxState extends State<BndBox> {
 //              linearStrokeCap: LinearStrokeCap.roundAll,
 //              progressColor: Colors.green,
 //            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
             child: Container(
               height: 100,
               width: 100,
@@ -209,6 +212,7 @@ class _BndBoxState extends State<BndBox> {
                   ),
                 ),
               ),
+            ),
             ),
           ),
         ],
