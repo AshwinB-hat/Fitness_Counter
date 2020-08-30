@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 
 class BndBox extends StatefulWidget {
@@ -29,6 +28,7 @@ class BndBox extends StatefulWidget {
 class _BndBoxState extends State<BndBox> {
   Map<String, List<double>> inputArr = new Map();
   int _counter = 0;
+  FlutterTts flutterTts = new FlutterTts();
   double lowerRange = 500,
   upperRange = 300;
   bool midCount = false, isCorrectPosture=false;
@@ -37,18 +37,25 @@ class _BndBoxState extends State<BndBox> {
     setState(() {
       _counter = 0;
     });
+    flutterTts.speak("Your Workout has Started!");
   }
 
   void incrementCounter() {
     setState(() {
       _counter++;
     });
+    flutterTts.speak(_counter.toString());
   }
 
   void setMidCount(bool f) {
+    //when midcount is activated
+    if(f && !midCount) {
+      flutterTts.speak("Perfect!");
+    }
     setState(() {
       midCount = f;
     });
+
   }
 
   Color getCounterColor() {
