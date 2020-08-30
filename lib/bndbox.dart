@@ -26,10 +26,11 @@ class BndBox extends StatefulWidget {
 }
 
 class _BndBoxState extends State<BndBox> {
-
-  List<dynamic> _inputArr = [];
+  Map<String, List<double>> inputArr = new Map();
   int _counter = 0;
-  bool flag = false;
+  double lowerRange = 500,
+  upperRange = 300;
+  bool flag = false, isCorrectPosture=false;
 
   void resetCounter() {
     setState(() {
@@ -43,24 +44,77 @@ class _BndBoxState extends State<BndBox> {
     });
   }
 
-  Future<void> _getPrediction(List<double> poses) async {
+  void setFlag(bool f) {
+    setState(() {
+      flag = f;
+    });
+  }
+
+  Color getCounterColor() {
+    if(isCorrectPosture) {
+      return Colors.green;
+    } else {
+      return Colors.red;
+    }
+  }
+
+  Positioned _createPositionedBlobs(double x, double y) {
+    return Positioned(
+      height: 5,
+      width: 40,
+      left:x,
+      top:y,
+      child: Container(
+        color: getCounterColor(),
+      ),
+    );
+  }
+  List<Widget> _renderHelperBlobs() {
+    List<Widget> listToReturn = <Widget>[];
+    listToReturn.add(_createPositionedBlobs(0, upperRange));
+    listToReturn.add(_createPositionedBlobs(0, lowerRange));
+    return listToReturn;
+  }
+
+  //region Core
+
+  _checkCorrectPosture(Map<String, List<double>> poses) {
+      if(poses['leftShoulder'][1]<upperRange
+         && poses['rightShoulder'][1]<upperRange
+         && poses['rightKnee'][1]>lowerRange
+         && poses['leftKnee'][1]>lowerRange){
+          if(!isCorrectPosture){
+            setState(() {
+              isCorrectPosture=true;
+            });
+          }
+      } else {
+        if(isCorrectPosture) {
+          setState(() {
+            isCorrectPosture = false;
+          });
+        }
+      }
+  }
+
+  Future<void> _countingLogic(Map<String, List<double>> poses) async {
     if (poses != null) {
-      if (poses.elementAt(1) > 500 && poses.elementAt(3) > 500) {
-        flag = true;
+      //check posture before beginning count
+      if (isCorrectPosture && poses['leftShoulder'][1] > upperRange && poses['rightShoulder'][1] > upperRange) {
+        setFlag(true);
       }
 
-      if (flag) {
-        double range = 300;
-        bool left_height_diff = poses.elementAt(1) < range;
-        bool right_height_diff = poses.elementAt(3) < range;
-
-        if (left_height_diff && right_height_diff) {
-          _counter++;
-          flag = false;
+      if (flag && poses['leftShoulder'][1] < upperRange && poses['rightShoulder'][1] < upperRange) {
+          incrementCounter();
+          setFlag(false);
         }
+
+      if(!flag) {
+        _checkCorrectPosture(poses);
       }
     }
   }
+  //endregion
 
   @override
   Widget build(BuildContext context) {
@@ -85,10 +139,8 @@ class _BndBoxState extends State<BndBox> {
             x = _x * scaleW;
             y = (_y - difH / 2) * scaleH;
           }
-          if (k["part"] == 'rightShoulder' || k["part"] == 'leftShoulder') {
-            _inputArr.add(x);
-            _inputArr.add(y);
-          }
+
+          inputArr[k['part']] = [x,y];
 
           // To solve mirror problem on front camera
           if (x > 320) {
@@ -115,16 +167,18 @@ class _BndBoxState extends State<BndBox> {
           );
         }).toList();
 
-        _getPrediction(_inputArr.cast<double>().toList());
+        _countingLogic(inputArr);
 
-        _inputArr.clear();
-
+        inputArr.clear();
         lists..addAll(list);
       });
       return lists;
     }
 
     return Stack(children: <Widget>[
+      Stack(
+       children: _renderHelperBlobs(),
+      ),
       Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -146,7 +200,7 @@ class _BndBoxState extends State<BndBox> {
               width: 100,
               child: FittedBox(
                 child: FloatingActionButton(
-                  backgroundColor: Colors.red,
+                  backgroundColor: getCounterColor(),
                   onPressed: resetCounter,
                   child: Text(
                     '${_counter.toString()}',
