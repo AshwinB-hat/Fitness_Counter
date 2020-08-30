@@ -26,18 +26,30 @@ class BndBox extends StatefulWidget {
 }
 
 class _BndBoxState extends State<BndBox> {
-  Map<String, List<double>> inputArr = new Map();
-  int _counter = 0;
-  FlutterTts flutterTts = new FlutterTts();
-  double lowerRange = 500,
-  upperRange = 300;
-  bool midCount = false, isCorrectPosture=false;
+  Map<String, List<double>> inputArr;
+  int _counter;
+  FlutterTts flutterTts;
+  double lowerRange, upperRange;
+  bool midCount,isCorrectPosture;
+
+  @override
+  void initState() {
+    super.initState();
+    inputArr=new Map();
+    _counter=0;
+    midCount=false;
+    isCorrectPosture=false;
+    upperRange=300;
+    lowerRange=500;
+    flutterTts = new FlutterTts();
+    flutterTts.speak("Your Workout Has Started");
+  }
 
   void resetCounter() {
     setState(() {
       _counter = 0;
     });
-    flutterTts.speak("Your Workout has Started!");
+    flutterTts.speak("Your Workout has been Reset");
   }
 
   void incrementCounter() {
