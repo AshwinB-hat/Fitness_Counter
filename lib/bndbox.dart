@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-List<dynamic> _inputArr = [];
-int _counter = 0;
-bool flag = false;
 
-class BndBox extends StatelessWidget {
+class BndBox extends StatefulWidget {
   final List<dynamic> results;
   final int previewH;
   final int previewW;
@@ -24,30 +21,70 @@ class BndBox extends StatelessWidget {
   });
 
   @override
+  _BndBoxState createState() => _BndBoxState();
+
+}
+
+class _BndBoxState extends State<BndBox> {
+
+  List<dynamic> _inputArr = [];
+  int _counter = 0;
+  bool flag = false;
+
+  void resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
+  }
+
+  void incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  Future<void> _getPrediction(List<double> poses) async {
+    if (poses != null) {
+      if (poses.elementAt(1) > 500 && poses.elementAt(3) > 500) {
+        flag = true;
+      }
+
+      if (flag) {
+        double range = 300;
+        bool left_height_diff = poses.elementAt(1) < range;
+        bool right_height_diff = poses.elementAt(3) < range;
+
+        if (left_height_diff && right_height_diff) {
+          _counter++;
+          flag = false;
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<Widget> _renderKeypoints() {
       var lists = <Widget>[];
-      results.forEach((re) {
+      widget.results.forEach((re) {
         var list = re["keypoints"].values.map<Widget>((k) {
           var _x = k["x"];
           var _y = k["y"];
           var scaleW, scaleH, x, y;
 
-          if (screenH / screenW > previewH / previewW) {
-            scaleW = screenH / previewH * previewW;
-            scaleH = screenH;
-            var difW = (scaleW - screenW) / scaleW;
+          if (widget.screenH / widget.screenW > widget.previewH / widget.previewW) {
+            scaleW = widget.screenH / widget.previewH * widget.previewW;
+            scaleH = widget.screenH;
+            var difW = (scaleW - widget.screenW) / scaleW;
             x = (_x - difW / 2) * scaleW;
             y = _y * scaleH;
           } else {
-            scaleH = screenW / previewW * previewH;
-            scaleW = screenW;
-            var difH = (scaleH - screenH) / scaleH;
+            scaleH = widget.screenW / widget.previewW * widget.previewH;
+            scaleW = widget.screenW;
+            var difH = (scaleH - widget.screenH) / scaleH;
             x = _x * scaleW;
             y = (_y - difH / 2) * scaleH;
           }
-          // print('x: ' + x.toString());
-          // print('y: ' + y.toString());
           if (k["part"] == 'rightShoulder' || k["part"] == 'leftShoulder') {
             _inputArr.add(x);
             _inputArr.add(y);
@@ -61,7 +98,6 @@ class BndBox extends StatelessWidget {
             var temp = 320 - x;
             x = 320 + temp;
           }
-
           return Positioned(
             left: x - 275,
             top: y - 50,
@@ -79,7 +115,6 @@ class BndBox extends StatelessWidget {
           );
         }).toList();
 
-//         print("Input Arr: " + _inputArr.toList().toString());
         _getPrediction(_inputArr.cast<double>().toList());
 
         _inputArr.clear();
@@ -128,28 +163,5 @@ class BndBox extends StatelessWidget {
         children: _renderKeypoints(),
       ),
     ]);
-  }
-
-  Future<void> _getPrediction(List<double> poses) async {
-    if (poses != null) {
-      if (poses.elementAt(1) > 500 && poses.elementAt(3) > 500) {
-        flag = true;
-      }
-
-      if (flag) {
-        double range = 300;
-        bool left_height_diff = poses.elementAt(1) < range;
-        bool right_height_diff = poses.elementAt(3) < range;
-
-        if (left_height_diff && right_height_diff) {
-          _counter++;
-          flag = false;
-        }
-      }
-    }
-  }
-
-  void resetCounter() {
-    _counter = 0;
   }
 }
