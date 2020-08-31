@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:yoga_guru/util/pose_data.dart';
 
 
 class BndBox extends StatefulWidget {
@@ -32,6 +33,15 @@ class _BndBoxState extends State<BndBox> {
   double lowerRange, upperRange;
   bool midCount,isCorrectPosture;
 
+  void setRangeBasedOnModel(){
+    if(widget.customModel == bodyWeight[0]){
+      upperRange=300;
+      lowerRange=500;
+    } else if(widget.customModel == bodyWeight[1]) {
+      upperRange = 500;
+      lowerRange = 700;
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -39,8 +49,7 @@ class _BndBoxState extends State<BndBox> {
     _counter=0;
     midCount=false;
     isCorrectPosture=false;
-    upperRange=300;
-    lowerRange=500;
+    setRangeBasedOnModel();
     flutterTts = new FlutterTts();
     flutterTts.speak("Your Workout Has Started");
   }
@@ -89,6 +98,7 @@ class _BndBoxState extends State<BndBox> {
       ),
     );
   }
+
   List<Widget> _renderHelperBlobs() {
     List<Widget> listToReturn = <Widget>[];
     listToReturn.add(_createPositionedBlobs(0, upperRange));
