@@ -107,12 +107,20 @@ class _BndBoxState extends State<BndBox> {
   }
 
   //region Core
-
+  bool _postureAccordingToExercise(Map<String, List<double>> poses){
+    if(widget.customModel==bodyWeight[1]) {
+      return poses['leftShoulder'][1] < upperRange
+          && poses['rightShoulder'][1] < upperRange;
+    }
+    if(widget.customModel==bodyWeight[0]) {
+      return poses['leftShoulder'][1] < upperRange
+          && poses['rightShoulder'][1] < upperRange
+          && poses['rightKnee'][1]>lowerRange
+          && poses['leftKnee'][1]>lowerRange;
+    }
+  }
   _checkCorrectPosture(Map<String, List<double>> poses) {
-      if(poses['leftShoulder'][1]<upperRange
-         && poses['rightShoulder'][1]<upperRange
-         && poses['rightKnee'][1]>lowerRange
-         && poses['leftKnee'][1]>lowerRange){
+      if(_postureAccordingToExercise(poses)){
           if(!isCorrectPosture){
             setState(() {
               isCorrectPosture=true;
